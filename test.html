@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英単語スペリングテスト</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Helvetica Neue', 'Arial', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'BIZ UDPGothic', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 sm:p-6 md:p-8">
+    <div class="max-w-xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">英単語スペリングテスト</h1>
+            <p class="mt-2 text-slate-600">日本語の意味に合う英単語を書いてみよう！</p>
+        </header>
+
+        <!-- Quiz Area -->
+        <div id="quiz-area" class="bg-white p-6 rounded-xl shadow-md min-h-[300px] flex flex-col justify-between">
+            <div id="progress-indicator" class="text-right text-sm text-slate-500 mb-4 font-medium"></div>
+            <div id="question-container" class="text-lg flex-grow flex flex-col justify-center">
+                <!-- Question content will be injected here -->
+            </div>
+            <div id="feedback-container" class="mt-4 font-bold text-center h-12">
+                <!-- Feedback like "Correct!" or "Incorrect" will appear here -->
+            </div>
+        </div>
+
+        <!-- 結果表示エリア -->
+        <div id="result-container" class="hidden mt-8 text-center bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-slate-800">テスト結果</h2>
+            <p id="score" class="text-2xl mt-4"></p>
+            <p id="feedback-message" class="text-lg mt-2 font-medium"></p>
+            <!-- 間違えた単語リスト -->
+            <div id="mistake-list-container" class="mt-6"></div>
+        </div>
+
+        <!-- 途中確認エリア -->
+        <div id="mistake-check-container" class="hidden mt-8 text-center bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">間違った単語リスト（ここまで）</h2>
+            <div id="current-mistake-list" class="mb-4"></div>
+            <button id="close-mistake-check" class="bg-sky-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-600 transition">閉じる</button>
+        </div>
+
+        <!-- 操作ボタン -->
+        <div id="control-buttons" class="mt-6 text-center space-x-4">
+            <button id="check-btn" class="bg-sky-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 transition-transform transform hover:scale-105">回答を確認</button>
+            <button id="next-btn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-transform transform hover:scale-105 hidden">次の問題へ</button>
+            <button id="mistake-check-btn" class="bg-yellow-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 transition-transform transform hover:scale-105">途中の間違い確認</button>
+            <button id="reset-btn" class="bg-slate-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 transition-transform transform hover:scale-105">もう一度</button>
+        </div>
+    </div>
+
+    <script>
+        const wordList = [
+            { en: 'genius', ja: '才能' }, { en: 'attitude', ja: '態度' }, { en: 'feature', ja: '特徴' }, 
+            { en: 'prejudice', ja: '偏見' }, { en: 'advantage', ja: '有利' }, { en: 'interpreter', ja: '通訳者' }, 
+            { en: 'reputation', ja: '評判' }, { en: 'discrimination', ja: '差別' }, { en: 'direction', ja: '方向' }, 
+            { en: 'childhood', ja: '子供時代' }, { en: 'confidence', ja: '信頼' }, { en: 'courage', ja: '勇気' }, 
+            { en: 'career', ja: '経歴' }, { en: 'conflict', ja: '闘争' }, { en: 'poverty', ja: '貧乏' }, 
+            { en: 'dialect', ja: '方言' }, { en: 'rumor', ja: 'うわさ' }, { en: 'intellect', ja: '知性' }, 
+            { en: 'mischief', ja: 'いたずら' }, { en: 'authority', ja: '権威' }, { en: 'despair', ja: '絶望' }, 
+            { en: 'faculty', ja: '能力' }, { en: 'rage', ja: '激怒' }, { en: 'interaction', ja: '交流' }, 
+            { en: 'mess', ja: '滅茶苦茶な様子' }, { en: 'capacity', ja: '収容能力' }, { en: 'misery', ja: '惨めさ' }, 
+            { en: 'charity', ja: '慈善' }, { en: 'companion', ja: '仲間' }, { en: 'facility', ja: '器用さ' }, 
+            { en: 'envy', ja: '嫉妬' }, { en: 'pity', ja: '哀れみ' }, { en: 'wisdom', ja: '賢明さ' }, 
+            { en: 'emotion', ja: '同情' }, { en: 'fame', ja: '名声' }, { en: 'resemble', ja: '〜に似ている' }, 
+            { en: 'bother', ja: '〜を悩ます' }, { en: 'nod', ja: '頷く' }, { en: 'relate', ja: '関係させる' }, 
+            { en: 'argue', ja: '討論する' }, { en: 'doubt', ja: '〜を疑う' }, { en: 'deliver', ja: '〜を届ける' }, 
+            { en: 'rely', ja: '頼る' }, { en: 'deceive', ja: '〜を欺く' }, { en: 'impress', ja: '印象付ける' }, 
+            { en: 'accompany', ja: '〜と一緒に行く' }, { en: 'compare', ja: '〜を比較する' }, 
+            { en: 'encourage', ja: '〜を勇気づける' }, { en: 'neglect', ja: '軽視する' }, { en: 'congratulate', ja: '〜を祝う' }
+        ];
+
+        let allQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let mistakes = [];
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initializeQuiz() {
+            allQuestions = wordList.map(word => ({
+                question: word.ja,
+                answer: word.en
+            }));
+
+            allQuestions = shuffle(allQuestions);
+            currentQuestionIndex = 0;
+            score = 0;
+            mistakes = [];
+
+            document.getElementById('quiz-area').classList.remove('hidden');
+            document.getElementById('control-buttons').classList.remove('hidden');
+            document.getElementById('result-container').classList.add('hidden');
+            document.getElementById('mistake-check-container').classList.add('hidden');
+            
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= allQuestions.length) {
+                showResults();
+                return;
+            }
+
+            document.getElementById('progress-indicator').textContent = `問題 ${currentQuestionIndex + 1} / ${allQuestions.length}`;
+            
+            const questionContainer = document.getElementById('question-container');
+            const feedbackContainer = document.getElementById('feedback-container');
+            questionContainer.innerHTML = '';
+            feedbackContainer.innerHTML = '';
+
+            const q = allQuestions[currentQuestionIndex];
+            
+            const questionHTML = `
+                <label for="spell-input" class="block text-center text-xl font-medium text-slate-700 mb-4">${q.question}</label>
+                <div class="relative max-w-sm mx-auto">
+                    <input type="text" id="spell-input" class="text-center mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-lg" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </div>
+            `;
+            questionContainer.innerHTML = questionHTML;
+            
+            document.getElementById('check-btn').classList.remove('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            const spellInput = document.getElementById('spell-input');
+            spellInput.focus();
+            spellInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('check-btn').click();
+                }
+            });
+        }
+
+        function checkAnswer() {
+            const q = allQuestions[currentQuestionIndex];
+            const feedbackContainer = document.getElementById('feedback-container');
+            const input = document.getElementById('spell-input');
+            const userAnswer = input.value.trim().toLowerCase();
+            const isCorrect = (userAnswer === q.answer.toLowerCase());
+            
+            input.disabled = true;
+
+            if (isCorrect) {
+                score++;
+                feedbackContainer.innerHTML = `<span class="text-green-600 text-2xl">正解！ ○</span>`;
+            } else {
+                feedbackContainer.innerHTML = `<span class="text-red-600 text-2xl">不正解 ×</span><p class="text-slate-700 mt-1">正解は: ${q.answer}</p>`;
+                mistakes.push({
+                    question: q.question,
+                    answer: q.answer,
+                    userAnswer: input.value
+                });
+            }
+
+            document.getElementById('check-btn').classList.add('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+            document.getElementById('next-btn').focus();
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('quiz-area').classList.add('hidden');
+            document.getElementById('control-buttons').classList.add('hidden');
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.classList.remove('hidden');
+            
+            const totalQuestions = allQuestions.length;
+            document.getElementById('score').innerText = `正解数: ${score} / ${totalQuestions}`;
+            
+            const percentage = (score / totalQuestions) * 100;
+            const feedbackMessage = document.getElementById('feedback-message');
+            if (percentage === 100) {
+                feedbackMessage.innerText = 'パーフェクト！素晴らしい！🎉';
+                feedbackMessage.className = 'text-lg mt-2 font-medium text-amber-500';
+            } else if (percentage >= 80) {
+                feedbackMessage.innerText = 'すごい！あともう少し！';
+                feedbackMessage.className = 'text-lg mt-2 font-medium text-sky-600';
+            } else if (percentage >= 50) {
+                feedbackMessage.innerText = 'よくできました！間違えたところを復習しよう。';
+                feedbackMessage.className = 'text-lg mt-2 font-medium text-slate-700';
+            } else {
+                feedbackMessage.innerText = '頑張ろう！繰り返し挑戦することが大事だよ。';
+                feedbackMessage.className = 'text-lg mt-2 font-medium text-red-500';
+            }
+            // 間違えた単語リスト表示
+            renderMistakeList("mistake-list-container", mistakes);
+        }
+
+        function renderMistakeList(containerId, list) {
+            const container = document.getElementById(containerId);
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-green-700 mt-2">間違いはありませんでした！</p>`;
+                return;
+            }
+            let html = '<table class="mx-auto mt-2 text-left border-collapse"><thead><tr><th class="px-2 py-1 border-b">日本語</th><th class="px-2 py-1 border-b">あなたの答え</th><th class="px-2 py-1 border-b">正解</th></tr></thead><tbody>';
+            for (const m of list) {
+                html += `<tr>
+                    <td class="px-2 py-1 border-b">${m.question}</td>
+                    <td class="px-2 py-1 border-b">${m.userAnswer || '-'}</td>
+                    <td class="px-2 py-1 border-b">${m.answer}</td>
+                </tr>`;
+            }
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function showCurrentMistakes() {
+            // 途中までのmistakesを表示
+            document.getElementById('mistake-check-container').classList.remove('hidden');
+            renderMistakeList("current-mistake-list", mistakes);
+        }
+
+        function closeMistakeCheck() {
+            document.getElementById('mistake-check-container').classList.add('hidden');
+        }
+
+        document.getElementById('check-btn').addEventListener('click', checkAnswer);
+        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        document.getElementById('reset-btn').addEventListener('click', () => location.reload());
+        document.getElementById('mistake-check-btn').addEventListener('click', showCurrentMistakes);
+        document.getElementById('close-mistake-check').addEventListener('click', closeMistakeCheck);
+
+        window.onload = initializeQuiz;
+    </script>
+</body>
+</html>
