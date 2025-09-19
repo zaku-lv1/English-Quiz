@@ -34,13 +34,23 @@
             <h2 class="text-3xl font-bold text-slate-800">テスト結果</h2>
             <p id="score" class="text-2xl mt-4"></p>
             <p id="feedback-message" class="text-lg mt-2 font-medium"></p>
+            <!-- 間違えた単語リスト -->
+            <div id="mistake-list-container" class="mt-6"></div>
+        </div>
+
+        <!-- 途中確認エリア -->
+        <div id="mistake-check-container" class="hidden mt-8 text-center bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">間違った単語リスト（ここまで）</h2>
+            <div id="current-mistake-list" class="mb-4"></div>
+            <button id="close-mistake-check" class="bg-sky-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-600 transition">閉じる</button>
         </div>
 
         <!-- 操作ボタン -->
-        <div id="control-buttons" class="mt-6 text-center space-x-4">
-            <button id="check-btn" class="bg-sky-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 transition-transform transform hover:scale-105">回答を確認</button>
-            <button id="next-btn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-transform transform hover:scale-105 hidden">次の問題へ</button>
-            <button id="reset-btn" class="bg-slate-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 transition-transform transform hover:scale-105">もう一度</button>
+        <div id="control-buttons" class="mt-6 text-center space-x-2 sm:space-x-4">
+            <button id="check-btn" class="bg-sky-600 text-white font-bold py-3 px-6 sm:px-8 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 transition-transform transform hover:scale-105">回答を確認</button>
+            <button id="next-btn" class="bg-green-600 text-white font-bold py-3 px-6 sm:px-8 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-transform transform hover:scale-105 hidden">次の問題へ</button>
+            <button id="mistake-check-btn" class="bg-yellow-500 text-white font-bold py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 transition-transform transform hover:scale-105">途中の間違い確認</button>
+            <button id="reset-btn" class="bg-slate-500 text-white font-bold py-3 px-6 sm:px-8 rounded-lg shadow-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 transition-transform transform hover:scale-105">もう一度</button>
         </div>
     </div>
 
@@ -52,6 +62,7 @@
         let allQuestions = [];
         let currentQuestionIndex = 0;
         let score = 0;
+        let mistakes = [];
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -71,10 +82,12 @@
             
             currentQuestionIndex = 0;
             score = 0;
+            mistakes = [];
 
             document.getElementById('quiz-area').classList.remove('hidden');
             document.getElementById('control-buttons').classList.remove('hidden');
             document.getElementById('result-container').classList.add('hidden');
+            document.getElementById('mistake-check-container').classList.add('hidden');
             
             displayQuestion();
         }
@@ -129,6 +142,11 @@
                 feedbackContainer.innerHTML = `<span class="text-green-600 text-2xl">正解！ ○</span>`;
             } else {
                 feedbackContainer.innerHTML = `<span class="text-red-600 text-2xl">不正解 ×</span><p class="text-slate-700 mt-1">正解は: ${q.answer}</p>`;
+                mistakes.push({
+                    question: q.question,
+                    answer: q.answer,
+                    userAnswer: input.value
+                });
             }
 
             document.getElementById('check-btn').classList.add('hidden');
@@ -165,11 +183,41 @@
                 feedbackMessage.innerText = '頑張ろう！繰り返し挑戦することが大事だよ。';
                 feedbackMessage.className = 'text-lg mt-2 font-medium text-red-500';
             }
+            renderMistakeList("mistake-list-container", mistakes);
+        }
+
+        function renderMistakeList(containerId, list) {
+            const container = document.getElementById(containerId);
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-green-700 mt-2">間違いはありませんでした！</p>`;
+                return;
+            }
+            let html = '<div class="overflow-x-auto"><table class="mx-auto mt-2 text-left border-collapse"><thead><tr><th class="px-2 py-1 border-b">日本語</th><th class="px-2 py-1 border-b">あなたの答え</th><th class="px-2 py-1 border-b">正解</th></tr></thead><tbody>';
+            for (const m of list) {
+                html += `<tr>
+                    <td class="px-2 py-1 border-b">${m.question}</td>
+                    <td class="px-2 py-1 border-b text-red-600">${m.userAnswer || '-'}</td>
+                    <td class="px-2 py-1 border-b text-green-600">${m.answer}</td>
+                </tr>`;
+            }
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function showCurrentMistakes() {
+            document.getElementById('mistake-check-container').classList.remove('hidden');
+            renderMistakeList("current-mistake-list", mistakes);
+        }
+
+        function closeMistakeCheck() {
+            document.getElementById('mistake-check-container').classList.add('hidden');
         }
 
         document.getElementById('check-btn').addEventListener('click', checkAnswer);
         document.getElementById('next-btn').addEventListener('click', nextQuestion);
         document.getElementById('reset-btn').addEventListener('click', () => location.reload());
+        document.getElementById('mistake-check-btn').addEventListener('click', showCurrentMistakes);
+        document.getElementById('close-mistake-check').addEventListener('click', closeMistakeCheck);
 
         window.onload = initializeQuiz;
     </script>
