@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英単語スペリングテスト</title>
+    <title>二学期中間考査ユメタン</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -14,7 +14,7 @@
 <body class="bg-slate-100 text-slate-800 p-4 sm:p-6 md:p-8">
     <div class="max-w-xl mx-auto">
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">英単語スペリングテスト</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">二学期中間考査ユメタン</h1>
             <p class="mt-2 text-slate-600">日本語の意味に合う英単語を書いてみよう！</p>
         </header>
 
@@ -34,51 +34,24 @@
             <h2 class="text-3xl font-bold text-slate-800">テスト結果</h2>
             <p id="score" class="text-2xl mt-4"></p>
             <p id="feedback-message" class="text-lg mt-2 font-medium"></p>
-            <!-- 間違えた単語リスト -->
-            <div id="mistake-list-container" class="mt-6"></div>
-        </div>
-
-        <!-- 途中確認エリア -->
-        <div id="mistake-check-container" class="hidden mt-8 text-center bg-white p-6 rounded-xl shadow-lg">
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">間違った単語リスト（ここまで）</h2>
-            <div id="current-mistake-list" class="mb-4"></div>
-            <button id="close-mistake-check" class="bg-sky-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-600 transition">閉じる</button>
         </div>
 
         <!-- 操作ボタン -->
         <div id="control-buttons" class="mt-6 text-center space-x-4">
             <button id="check-btn" class="bg-sky-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 transition-transform transform hover:scale-105">回答を確認</button>
             <button id="next-btn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-transform transform hover:scale-105 hidden">次の問題へ</button>
-            <button id="mistake-check-btn" class="bg-yellow-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 transition-transform transform hover:scale-105">途中の間違い確認</button>
             <button id="reset-btn" class="bg-slate-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 transition-transform transform hover:scale-105">もう一度</button>
         </div>
     </div>
 
     <script>
         const wordList = [
-            { en: 'genius', ja: '才能' }, { en: 'attitude', ja: '態度' }, { en: 'feature', ja: '特徴' }, 
-            { en: 'prejudice', ja: '偏見' }, { en: 'advantage', ja: '有利' }, { en: 'interpreter', ja: '通訳者' }, 
-            { en: 'reputation', ja: '評判' }, { en: 'discrimination', ja: '差別' }, { en: 'direction', ja: '方向' }, 
-            { en: 'childhood', ja: '子供時代' }, { en: 'confidence', ja: '信頼' }, { en: 'courage', ja: '勇気' }, 
-            { en: 'career', ja: '経歴' }, { en: 'conflict', ja: '闘争' }, { en: 'poverty', ja: '貧乏' }, 
-            { en: 'dialect', ja: '方言' }, { en: 'rumor', ja: 'うわさ' }, { en: 'intellect', ja: '知性' }, 
-            { en: 'mischief', ja: 'いたずら' }, { en: 'authority', ja: '権威' }, { en: 'despair', ja: '絶望' }, 
-            { en: 'faculty', ja: '能力' }, { en: 'rage', ja: '激怒' }, { en: 'interaction', ja: '交流' }, 
-            { en: 'mess', ja: '滅茶苦茶な様子' }, { en: 'capacity', ja: '収容能力' }, { en: 'misery', ja: '惨めさ' }, 
-            { en: 'charity', ja: '慈善' }, { en: 'companion', ja: '仲間' }, { en: 'facility', ja: '器用さ' }, 
-            { en: 'envy', ja: '嫉妬' }, { en: 'pity', ja: '哀れみ' }, { en: 'wisdom', ja: '賢明さ' }, 
-            { en: 'emotion', ja: '同情' }, { en: 'fame', ja: '名声' }, { en: 'resemble', ja: '〜に似ている' }, 
-            { en: 'bother', ja: '〜を悩ます' }, { en: 'nod', ja: '頷く' }, { en: 'relate', ja: '関係させる' }, 
-            { en: 'argue', ja: '討論する' }, { en: 'doubt', ja: '〜を疑う' }, { en: 'deliver', ja: '〜を届ける' }, 
-            { en: 'rely', ja: '頼る' }, { en: 'deceive', ja: '〜を欺く' }, { en: 'impress', ja: '印象付ける' }, 
-            { en: 'accompany', ja: '〜と一緒に行く' }, { en: 'compare', ja: '〜を比較する' }, 
-            { en: 'encourage', ja: '〜を勇気づける' }, { en: 'neglect', ja: '軽視する' }, { en: 'congratulate', ja: '〜を祝う' }
+            {"en":"peninsula","ja":"半島"},{"en":"approach","ja":"〜に近づく"},{"en":"citizen","ja":"市民"},{"en":"pavement","ja":"舗装道路"},{"en":"assume","ja":"〜を想定する"},{"en":"slave","ja":"奴隷"},{"en":"origin","ja":"起源"},{"en":"separate","ja":"〜を分ける"},{"en":"progress","ja":"進歩"},{"en":"profit","ja":"利益"},{"en":"voyage","ja":"航海"},{"en":"found","ja":"〜の基礎を築く"},{"en":"tribe","ja":"種族"},{"en":"transportation","ja":"移動手段"},{"en":"mankind","ja":"人類"},{"en":"heritage","ja":"遺産"},{"en":"descendant","ja":"子孫"},{"en":"civilization","ja":"文明"},{"en":"era","ja":"時代"},{"en":"appear","ja":"現れる"},{"en":"congress","ja":"議会"},{"en":"district","ja":"地区"},{"en":"colony","ja":"植民地"},{"en":"destination","ja":"目的地"},{"en":"declare","ja":"〜を宣言する"},{"en":"ape","ja":"類人猿"},{"en":"cliff","ja":"崖"},{"en":"afford","ja":"〜する余裕がある"},{"en":"tradition","ja":"伝統"},{"en":"prosperity","ja":"繁栄"},{"en":"nationality","ja":"国籍"},{"en":"occupation","ja":"職業"},{"en":"term","ja":"専門用語"},{"en":"province","ja":"地方"},{"en":"ruin","ja":"〜を破滅させる"},{"en":"translate","ja":"〜を翻訳する"},{"en":"ancestor","ja":"先祖"},{"en":"fare","ja":"運賃"},{"en":"remain","ja":"依然として〜のままである"},{"en":"media","ja":"マスメディア"},{"en":"decade","ja":"10年間"},{"en":"atmosphere","ja":"雰囲気"},{"en":"destiny","ja":"運命"},{"en":"climate","ja":"気候"},{"en":"biography","ja":"伝記"},{"en":"outlook","ja":"見晴らし"},{"en":"evolution","ja":"進化"},{"en":"boundary","ja":"境界線"},{"en":"treasure","ja":"宝物"},{"en":"immigrant","ja":"移民"},{"en":"participate","ja":"〜に参加する"},{"en":"bet","ja":"〜を賭ける"},{"en":"conquer","ja":"〜を征服する"},{"en":"adjust","ja":"〜を適合させる"},{"en":"exchange","ja":"〜を交換する"},{"en":"reserve","ja":"〜を予約する"},{"en":"ban","ja":"〜を禁止する"},{"en":"linguistic","ja":"言語の"},{"en":"transfer","ja":"〜を移す"},{"en":"undergo","ja":"〜を経験する"},{"en":"brief","ja":"〜の要点をまとめる"},{"en":"cease","ja":"終わる"},{"en":"cost","ja":"〜がかかる"},{"en":"current","ja":"今の"},{"en":"trace","ja":"〜をたどる"},{"en":"immense","ja":"計り知れない"},{"en":"organize","ja":"〜を組織する"},{"en":"fluent","ja":"流ちょうな"},{"en":"flexible","ja":"融通の利く"},{"en":"disappear","ja":"見えなくなる"},{"en":"urban","ja":"都会の"},{"en":"delay","ja":"〜を延期する"},{"en":"rule","ja":"〜を支配する"},{"en":"develop","ja":"〜を発達させる"},{"en":"ancient","ja":"古代の"},{"en":"intend","ja":"〜を意図する"},{"en":"manage","ja":"何とか〜する"},{"en":"native","ja":"母国の"},{"en":"excel","ja":"優れている"},{"en":"surround","ja":"〜を取り囲む"},{"en":"rural","ja":"田舎の"},{"en":"release","ja":"〜を自由にする"},{"en":"cancel","ja":"〜を取り消す"},{"en":"literate","ja":"読み書きができる"},{"en":"unite","ja":"〜を結合させる"},{"en":"frightened","ja":"おびえた"},{"en":"conduct","ja":"〜を行う"},{"en":"content","ja":"満足して"},{"en":"ideal","ja":"理想的な"},{"en":"submit","ja":"〜を提出する"},{"en":"boring","ja":"退屈な"},{"en":"decrease","ja":"減少する"},{"en":"holy","ja":"神聖な"},{"en":"independent","ja":"独立した"},{"en":"rapid","ja":"速い"},{"en":"advance","ja":"〜を前進させる"},{"en":"vacant","ja":"空いている"},{"en":"involved","ja":"〜を伴う"},{"en":"invade","ja":"〜に侵入する"},{"en":"raise","ja":"〜を上げる"},{"en":"hurt","ja":"〜を傷つける"},{"en":"aid","ja":"援助"},{"en":"recover","ja":"〜を取り戻す"},{"en":"burden","ja":"荷"},{"en":"award","ja":"〜を授与する"},{"en":"lay","ja":"〜を横たえる"},{"en":"persist","ja":"固執する"},{"en":"circumstance","ja":"事情"},{"en":"opponent","ja":"相手"},{"en":"swell","ja":"ふくらむ"},{"en":"cell","ja":"細胞"},{"en":"search","ja":"〜を探す"},{"en":"effect","ja":"結果"},{"en":"bend","ja":"〜を曲げる"},{"en":"residence","ja":"住宅"},{"en":"disaster","ja":"災害"},{"en":"endeavor","ja":"努力"},{"en":"liquid","ja":"液体"},{"en":"express","ja":"〜を述べる"},{"en":"honor","ja":"名誉"},{"en":"infant","ja":"乳児"},{"en":"affect","ja":"〜に影響を及ぼす"},{"en":"strength","ja":"力"},{"en":"refuse","ja":"〜を断る"},{"en":"odds","ja":"優勢"},{"en":"chemical","ja":"化学薬品"},{"en":"emergency","ja":"緊急事態"},{"en":"exceed","ja":"〜に勝る"},{"en":"suffer","ja":"苦しむ"},{"en":"victim","ja":"犠牲者"},{"en":"motivation","ja":"動機"},{"en":"rescue","ja":"〜を救う"},{"en":"exercise","ja":"〜を行う"},{"en":"institution","ja":"協会"},{"en":"injury","ja":"傷"},{"en":"fatigue","ja":"疲労"},{"en":"competition","ja":"競争"},{"en":"examine","ja":"〜を調査する"},{"en":"regulation","ja":"規制"},{"en":"potential","ja":"可能性"},{"en":"prospect","ja":"見込み"},{"en":"process","ja":"〜を処理する"},{"en":"pause","ja":"一時休止"},{"en":"cure","ja":"〜を治す"},{"en":"frustration","ja":"欲求不満"},{"en":"justice","ja":"公正"},{"en":"symptom","ja":"症状"},{"en":"instruct","ja":"〜に教える"},{"en":"injection","ja":"注射"},{"en":"crash","ja":"衝突"},{"en":"mortal","ja":"死の運命にある"},{"en":"previous","ja":"前の"},{"en":"ignore","ja":"〜を無視する"},{"en":"strike","ja":"〜を打つ"},{"en":"acute","ja":"鋭い"},{"en":"fold","ja":"〜を折り畳む"},{"en":"fair","ja":"公正な"},{"en":"defend","ja":"〜を守る"},{"en":"grasp","ja":"〜をつかむ"},{"en":"thorough","ja":"徹底的な"},{"en":"apt","ja":"〜する傾向がある"},{"en":"artificial","ja":"人工の"},{"en":"imitate","ja":"〜をまねる"},{"en":"scratch","ja":"〜を引っかく"},{"en":"extreme","ja":"極端な"},{"en":"heal","ja":"〜を治す"},{"en":"ambitious","ja":"野心的な"},{"en":"urgent","ja":"緊急の"},{"en":"external","ja":"外部の"},{"en":"grow","ja":"〜を育てる"},{"en":"internal","ja":"内部の"},{"en":"restore","ja":"〜を戻す"},{"en":"relieve","ja":"〜を取り除く"},{"en":"mental","ja":"精神の"},{"en":"appropriate","ja":"適切な"},{"en":"chase","ja":"〜を追跡する"},{"en":"compete","ja":"競争する"},{"en":"elementary","ja":"初歩の"},{"en":"support","ja":"〜を支える"},{"en":"concentrate","ja":"〜を集中させる"},{"en":"aggressive","ja":"攻撃的な"},{"en":"genuine","ja":"誠実な"},{"en":"mention","ja":"〜について言及する"},{"en":"overcome","ja":"〜を克服する"},{"en":"recommend","ja":"〜を薦める"},{"en":"bear","ja":"〜を我慢する"},{"en":"drown","ja":"溺れ死ぬ"},{"en":"sore","ja":"痛い"},{"en":"physical","ja":"身体の"},{"en":"essential","ja":"極めて重要な"},{"en":"stretch","ja":"〜を伸ばす"},{"en":"acid","ja":"酸っぱい"},{"en":"anxious","ja":"心配して"},{"en":"fatal","ja":"致命的な"},{"en":"remove","ja":"〜を動かす"},{"en":"defeat","ja":"〜を打ち破る"},{"en":"successful","ja":"成功した"},{"en":"assist","ja":"〜を手伝う"},{"en":"incredible","ja":"信じられない"},{"en":"prevent","ja":"〜を妨げる"},{"en":"attitude","ja":"態度"},{"en":"discrimination","ja":"差別"},{"en":"despair","ja":"絶望"},{"en":"feature","ja":"特徴"},{"en":"neglect","ja":"〜を軽視する"},{"en":"relate","ja":"〜を関係させる"},{"en":"direction","ja":"方向"},{"en":"emotion","ja":"感情"},{"en":"mess","ja":"めちゃくちゃな様子"},{"en":"rely","ja":"〜に頼る"},{"en":"mischief","ja":"いたずら"},{"en":"interaction","ja":"交互作用"},{"en":"misery","ja":"哀れみ"},{"en":"pity","ja":"〜を哀れむ"},{"en":"facility","ja":"施設"},{"en":"poverty","ja":"貧乏"},{"en":"reputation","ja":"評判"},{"en":"envy","ja":"〜をうらやむ"},{"en":"prejudice","ja":"偏見"},{"en":"doubt","ja":"〜を疑う"},{"en":"accompany","ja":"〜と一緒に行く"},{"en":"dialect","ja":"方言"},{"en":"conflict","ja":"闘争"},{"en":"nod","ja":"うなずく"},{"en":"capacity","ja":"収容能力"},{"en":"bother","ja":"〜を悩ます"},{"en":"career","ja":"経歴"},{"en":"resemble","ja":"〜に似ている"},{"en":"advantage","ja":"有利"},{"en":"childhood","ja":"子供時代"},{"en":"impress","ja":"〜に印象付ける"},{"en":"fame","ja":"名声"},{"en":"wisdom","ja":"賢明さ"},{"en":"authority","ja":"権威"},{"en":"compare","ja":"〜を比較する"},{"en":"intellect","ja":"知性"},{"en":"charity","ja":"慈善"},{"en":"rumor","ja":"うわさ"},{"en":"congratulate","ja":"〜を祝う"},{"en":"courage","ja":"勇気"},{"en":"deceive","ja":"〜を欺く"},{"en":"rage","ja":"激怒"},{"en":"genius","ja":"天才"},{"en":"companion","ja":"仲間"},{"en":"interpreter","ja":"通訳者"},{"en":"argue","ja":"〜を議論する"},{"en":"deliver","ja":"〜を配達する"},{"en":"encourage","ja":"〜を勇気づける"},{"en":"legend","ja":"伝説"},{"en":"score","ja":"得点"}
         ];
 
         let allQuestions = [];
         let currentQuestionIndex = 0;
         let score = 0;
-        let mistakes = [];
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -95,14 +68,13 @@
             }));
 
             allQuestions = shuffle(allQuestions);
+            
             currentQuestionIndex = 0;
             score = 0;
-            mistakes = [];
 
             document.getElementById('quiz-area').classList.remove('hidden');
             document.getElementById('control-buttons').classList.remove('hidden');
             document.getElementById('result-container').classList.add('hidden');
-            document.getElementById('mistake-check-container').classList.add('hidden');
             
             displayQuestion();
         }
@@ -151,17 +123,12 @@
             const isCorrect = (userAnswer === q.answer.toLowerCase());
             
             input.disabled = true;
-
+            
             if (isCorrect) {
                 score++;
                 feedbackContainer.innerHTML = `<span class="text-green-600 text-2xl">正解！ ○</span>`;
             } else {
                 feedbackContainer.innerHTML = `<span class="text-red-600 text-2xl">不正解 ×</span><p class="text-slate-700 mt-1">正解は: ${q.answer}</p>`;
-                mistakes.push({
-                    question: q.question,
-                    answer: q.answer,
-                    userAnswer: input.value
-                });
             }
 
             document.getElementById('check-btn').classList.add('hidden');
@@ -198,43 +165,11 @@
                 feedbackMessage.innerText = '頑張ろう！繰り返し挑戦することが大事だよ。';
                 feedbackMessage.className = 'text-lg mt-2 font-medium text-red-500';
             }
-            // 間違えた単語リスト表示
-            renderMistakeList("mistake-list-container", mistakes);
-        }
-
-        function renderMistakeList(containerId, list) {
-            const container = document.getElementById(containerId);
-            if (list.length === 0) {
-                container.innerHTML = `<p class="text-green-700 mt-2">間違いはありませんでした！</p>`;
-                return;
-            }
-            let html = '<table class="mx-auto mt-2 text-left border-collapse"><thead><tr><th class="px-2 py-1 border-b">日本語</th><th class="px-2 py-1 border-b">あなたの答え</th><th class="px-2 py-1 border-b">正解</th></tr></thead><tbody>';
-            for (const m of list) {
-                html += `<tr>
-                    <td class="px-2 py-1 border-b">${m.question}</td>
-                    <td class="px-2 py-1 border-b">${m.userAnswer || '-'}</td>
-                    <td class="px-2 py-1 border-b">${m.answer}</td>
-                </tr>`;
-            }
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        }
-
-        function showCurrentMistakes() {
-            // 途中までのmistakesを表示
-            document.getElementById('mistake-check-container').classList.remove('hidden');
-            renderMistakeList("current-mistake-list", mistakes);
-        }
-
-        function closeMistakeCheck() {
-            document.getElementById('mistake-check-container').classList.add('hidden');
         }
 
         document.getElementById('check-btn').addEventListener('click', checkAnswer);
         document.getElementById('next-btn').addEventListener('click', nextQuestion);
         document.getElementById('reset-btn').addEventListener('click', () => location.reload());
-        document.getElementById('mistake-check-btn').addEventListener('click', showCurrentMistakes);
-        document.getElementById('close-mistake-check').addEventListener('click', closeMistakeCheck);
 
         window.onload = initializeQuiz;
     </script>
