@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>助動詞と受動態 復習クイズ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+        .draggable-item {
+            cursor: grab;
+            user-select: none;
+        }
+        .drop-zone {
+            min-height: 50px;
+            border-style: dashed;
+        }
+        .dragging {
+            opacity: 0.5;
+            background-color: #e0e7ff;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8 transition-all duration-500">
+        
+        <div id="start-screen">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 text-center mb-2">総合英語クイズ</h1>
+            <p class="text-slate-600 text-center mb-8">テキストの内容を参考に作成したクイズで実力を試してみよう！</p>
+            <button id="start-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                クイズを始める (ランダム10問)
+            </button>
+        </div>
+
+        <div id="quiz-screen" class="hidden">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-sm font-semibold text-slate-500">
+                    <span id="question-counter"></span>
+                </div>
+                <div class="text-sm font-bold text-blue-500">
+                    スコア: <span id="score">0</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <!-- Question -->
+            <div class="mb-6">
+                <p id="japanese-prompt" class="text-slate-600 text-center text-lg mb-3"></p>
+                <div id="question-area" class="bg-slate-50 p-4 rounded-lg text-center text-xl font-medium text-slate-800">
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div id="options-container" class="grid grid-cols-1 gap-3 mb-4">
+                <!-- Options will be injected here -->
+            </div>
+            
+             <!-- Scramble Area -->
+            <div id="scramble-area" class="hidden">
+                <div id="answer-zone" class="drop-zone border-2 border-slate-300 rounded-lg p-3 mb-3 flex flex-wrap gap-2 items-center bg-slate-50"></div>
+                <p class="text-center text-sm text-slate-500 mb-3">下の単語をドラッグ＆ドロップして文を完成させてください。</p>
+                <div id="word-bank" class="flex flex-wrap gap-2 justify-center p-3 bg-white rounded-lg border"></div>
+            </div>
+
+
+            <!-- Feedback -->
+            <div id="feedback" class="text-center font-bold mt-4 p-3 rounded-lg hidden"></div>
+
+            <!-- Next Button -->
+            <button id="next-btn" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-lg mt-4 transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-slate-300 hidden">
+                次へ
+            </button>
+        </div>
+        
+        <div id="result-screen" class="hidden text-center">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">クイズ終了！</h2>
+            <p class="text-xl text-slate-600 mb-6">あなたのスコアは...</p>
+            <div class="bg-blue-500 text-white rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-6">
+                <p class="text-4xl font-bold"><span id="final-score"></span> / <span id="total-questions"></span></p>
+            </div>
+            <p id="result-message" class="text-lg font-semibold mb-8"></p>
+            <button id="restart-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                もう一度挑戦する
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const allQuizData = [
+            // Lesson 5
+            { type: 'mcq', japanese: '「この歌を歌えますか？」「はい、歌えます」', question: 'Can you sing this song? - Yes, I {blank}.', options: ['can', 'may', 'will'], answer: 'can', explanation: '`Can you ...?`（〜できますか？）と能力について尋ねられたので、`can` を使って答えます。' },
+            { type: 'mcq', japanese: '「あなたのオフィスに行ってもいいですか？」「かまいませんよ」', question: '{blank} I come to your office? - No problem.', options: ['May', 'Must', 'Should'], answer: 'May', explanation: '`May I ...?` は「〜してもいいですか？」と許可を求める丁寧な表現です。' },
+            { type: 'mcq', japanese: '「私たちは予約をキャンセルする方がいい。」', question: "We'd better {blank} our reservation.", options: ['cancel', 'to cancel', 'canceling'], answer: 'cancel', explanation: '`had better + 動詞の原形` で「〜する方がよい」というアドバイスや軽い命令を表します。' },
+            { type: 'mcq', japanese: '「夜8時以降は外出しない方がいい。」', question: "You {blank} go out after eight p.m.", options: ['had better not', "hadn't better", 'not better'], answer: 'had better not', explanation: '`had better` の否定形は `had better not` です。' },
+            
+            // Lesson 6
+            { type: 'mcq', japanese: '「この小説はベストセラーになるに違いない。」', question: 'This novel {blank} be a bestseller.', options: ['must', 'may', 'will'], answer: 'must', explanation: '`must` は「〜に違いない」という強い確信を表す助動詞です。' },
+            { type: 'mcq', japanese: '「この記事はフェイクニュースかもしれない。」', question: 'This article {blank} be fake news.', options: ['might', 'must', 'will'], answer: 'might', explanation: '`might` は `may` よりも可能性が低い「〜かもしれない」という推量を表します。' },
+            { type: 'mcq', japanese: '「彼は疲れているに違いない。3時間も運転していたのだから。」', question: "He {blank} be tired because he's been driving for three hours.", options: ['must', "can't", 'may not'], answer: 'must', explanation: '理由が明確なので、「〜に違いない」という強い確信を表す `must` が適切です。' },
+            { type: 'scramble', japanese: '「誰かが来る前にこの部屋を掃除したのかもしれない。」', words: ['Someone', 'might', 'have', 'cleaned', 'this', 'room', 'before', 'we', 'came', '.'], answer: 'Someone might have cleaned this room before we came.', explanation: '過去の出来事に対する推量は `助動詞 + have + 過去分詞` で表します。「〜したかもしれない」なので `might have cleaned` となります。' },
+            
+            // Lesson 7
+            { type: 'mcq', japanese: '「外出するよりは、家でテレビゲームをしたいです。」', question: "I'd rather {blank} video games at home than go out.", options: ['play', 'to play', 'playing'], answer: 'play', explanation: '`would rather + 動詞の原形` で「（〜するよりも）むしろ〜したい」という意味になります。' },
+            { type: 'mcq', japanese: '「この部屋を掃除するのを手伝っていただけますか？」', question: '{blank} you help me clean this room?', options: ['Would', 'Shall', 'Must'], answer: 'Would', explanation: '`Would you ...?` は `Will you ...?` よりも丁寧な依頼の表現です。' },
+            { type: 'mcq', japanese: '「信じられないかもしれませんが、私は泳いでいるときにサメを見ました。」', question: 'You may not believe it, but I {blank} a shark while I was swimming.', options: ['saw', 'have seen', 'see'], answer: 'saw', explanation: '`while I was swimming`（泳いでいる間に）と過去の特定の時点を示しているので、過去形 `saw` が適切です。' },
+            { type: 'mcq', japanese: '「君はそんなに高い辞書を買わなければよかったのに。」', question: 'You {blank} have bought such an expensive dictionary.', options: ['need not', "can't", "mustn't"], answer: 'need not', explanation: '`need not have + 過去分詞` で「〜する必要はなかったのに（してしまった）」という過去の不要な行動に対する表現です。' },
+            
+            // Lesson 8
+            { type: 'mcq', japanese: '「この仕事は金曜日までに終えなければならない。」', question: 'This work must {blank} finished by Friday.', options: ['be', 'is', 'was'], answer: 'be', explanation: '助動詞 `must` を含む文を受動態にする場合、`must be + 過去分詞` の形になります。' },
+            { type: 'scramble', japanese: '「私はそのパーティーに招待されませんでした。」', words: ['I', 'was', 'not', 'invited', 'to', 'the', 'party', '.'], answer: 'I was not invited to the party.', explanation: '過去の出来事の否定なので、`be動詞` の過去形 `was` に `not` をつけます。' },
+            { type: 'scramble', japanese: '「インドでは何語が話されていますか？」', words: ['What', 'languages', 'are', 'spoken', 'in', 'India', '?'], answer: 'What languages are spoken in India?', explanation: '`languages` が複数形なので、`be動詞` は `are` を使います。' },
+            { type: 'mcq', japanese: '「この魚は今朝獲れたものです。」', question: 'These fish {blank} this morning.', options: ['were caught', 'are caught', 'have caught'], answer: 'were caught', explanation: '`this morning` と過去の時点を表しているので、過去形の受動態 `were caught` を使います。`fish` は複数形です。' },
+            { type: 'mcq', japanese: '「台風が来ているので、お祭りは中止されるかもしれません。」', question: "I'm afraid the festival might {blank}.", options: ['be called off', 'call off', 'be calling off'], answer: 'be called off', explanation: '`might` を含む受動態は `might be + 過去分詞` となります。`call off` は「中止する」という意味の句動詞です。' },
+            
+            // Lesson 9
+            { type: 'mcq', japanese: '「私の自転車が盗まれてしまった。」', question: 'My bicycle has {blank} stolen.', options: ['been', 'was', 'is'], answer: 'been', explanation: '現在完了形 `have + 過去分詞` の受動態は `have been + 過去分詞` となります。' },
+            { type: 'mcq', japanese: '「駅の近くに新しいホテルが建設中です。」', question: 'A new hotel is {blank} built near the station.', options: ['being', 'been', 'be'], answer: 'being', explanation: '現在進行形 `be動詞 + -ing` の受動態は `be動詞 + being + 過去分詞` となります。「建設されている最中」という意味です。' },
+            { type: 'mcq', japanese: '「僕のシャツはどこ？」「洗濯機の中だよ。まだ洗われていないけど。」', question: "Where's my shirt? - In the washing machine. It's not been {blank} yet.", options: ['washed', 'washing', 'wash'], answer: 'washed', explanation: '現在完了形の受動態 `have been + 過去分詞` の否定文です。' },
+            { type: 'mcq', japanese: '「その試合は中止になりました。」', question: 'The game has {blank}.', options: ['been called off', 'called off', 'was called off'], answer: 'been called off', explanation: '「中止になった」という結果が現在に影響しているので、現在完了形の受動態を使います。' },
+            
+            // Lesson 10
+            { type: 'scramble', japanese: '「その花瓶は日当たりの良い場所に置くべきです。」', words: ['The', 'flowerpot', 'should', 'be', 'kept', 'in', 'a', 'sunny', 'place', '.'], answer: 'The flowerpot should be kept in a sunny place.', explanation: '助動詞 `should` を含む受動態は `should be + 過去分詞` の形になります。' },
+            { type: 'mcq', japanese: '「勝者には100万円が与えられます。」', question: 'The winner will {blank} given one million yen.', options: ['be', 'is', 'have'], answer: 'be', explanation: '助動詞 `will` を含む未来形の受動態は `will be + 過去分詞` の形になります。' },
+            { type: 'mcq', japanese: '「犯人は逮捕されています。」', question: 'The criminal {blank} been arrested.', options: ['has', 'is', 'was'], answer: 'has', explanation: '「（すでに）逮捕されている」という完了・結果を表すので、現在完了形の受動態 `has been arrested` となります。' },
+            { type: 'mcq', japanese: '「ユミはテニス部のキャプテンに選ばれました。」', question: 'Yumi {blank} elected captain of the tennis club.', options: ['was', 'is', 'has'], answer: 'was', explanation: '過去の出来事として「選ばれた」ので、過去形の受動態 `was elected` を使います。' },
+            { type: 'mcq', japanese: '「この桜の木は樹齢およそ500年だと言われています。」', question: 'This cherry tree {blank} to be about 500 years old.', options: ['is said', 'says', 'was said'], answer: 'is said', explanation: '`It is said that ...` の書き換えで、`S is said to do ...`（Sは〜すると言われている）という構文です。' },
+            { type: 'mcq', japanese: '「地球温暖化のせいで私たちの列車は遅れたと、誰かが言った。」', question: 'Someone told us that our train was delayed {blank} global warming.', options: ['due to', 'because', 'so that'], answer: 'due to', explanation: '`due to ...` は「〜が原因で」という意味で、後ろに名詞（句）がきます。`because of` とほぼ同じ意味です。' },
+        ];
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const startBtn = document.getElementById('start-btn');
+        const questionCounter = document.getElementById('question-counter');
+        const scoreDisplay = document.getElementById('score');
+        const progressBar = document.getElementById('progress-bar');
+        const japanesePrompt = document.getElementById('japanese-prompt');
+        const questionArea = document.getElementById('question-area');
+        const optionsContainer = document.getElementById('options-container');
+        const scrambleArea = document.getElementById('scramble-area');
+        const answerZone = document.getElementById('answer-zone');
+        const wordBank = document.getElementById('word-bank');
+        const feedback = document.getElementById('feedback');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+
+        let quizData = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let draggedItem = null;
+
+        startBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        function startQuiz() {
+            // Shuffle all questions and pick the first 10
+            const shuffled = allQuizData.sort(() => 0.5 - Math.random());
+            quizData = shuffled.slice(0, 10);
+
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreDisplay.textContent = score;
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            resetState();
+            const question = quizData[currentQuestionIndex];
+            
+            questionCounter.textContent = `問題 ${currentQuestionIndex + 1} / ${quizData.length}`;
+            progressBar.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+            japanesePrompt.textContent = question.japanese;
+
+            if (question.type === 'mcq') {
+                optionsContainer.classList.remove('hidden');
+                scrambleArea.classList.add('hidden');
+                questionArea.innerHTML = question.question.replace('{blank}', '<span class="font-bold text-blue-500">＿＿＿</span>');
+                
+                question.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('w-full', 'border-2', 'border-slate-300', 'text-slate-700', 'font-semibold', 'py-3', 'px-4', 'rounded-lg', 'transition', 'duration-200', 'ease-in-out', 'hover:bg-blue-50', 'hover:border-blue-400');
+                    button.addEventListener('click', () => checkMCQAnswer(option));
+                    optionsContainer.appendChild(button);
+                });
+
+            } else if (question.type === 'scramble') {
+                optionsContainer.classList.add('hidden');
+                scrambleArea.classList.remove('hidden');
+                questionArea.textContent = '語順を並べ替えてください。';
+                
+                const shuffledWords = [...question.words].sort(() => Math.random() - 0.5);
+                shuffledWords.forEach(word => {
+                    const wordDiv = createWordDiv(word);
+                    wordBank.appendChild(wordDiv);
+                });
+            }
+        }
+        
+        function createWordDiv(word) {
+            const wordDiv = document.createElement('div');
+            wordDiv.textContent = word;
+            wordDiv.classList.add('draggable-item', 'bg-white', 'border', 'border-slate-300', 'rounded-md', 'px-3', 'py-1', 'shadow-sm');
+            wordDiv.draggable = true;
+            wordDiv.addEventListener('dragstart', handleDragStart);
+            wordDiv.addEventListener('dragend', handleDragEnd);
+            return wordDiv;
+        }
+
+        function handleDragStart(e) {
+            draggedItem = e.target;
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+
+        function handleDragEnd(e) {
+            draggedItem.classList.remove('dragging');
+            draggedItem = null;
+        }
+
+        answerZone.addEventListener('dragover', e => { e.preventDefault(); });
+        wordBank.addEventListener('dragover', e => { e.preventDefault(); });
+        
+        answerZone.addEventListener('drop', e => {
+            e.preventDefault();
+            if (draggedItem) {
+                answerZone.appendChild(draggedItem);
+                checkScrambleAnswer();
+            }
+        });
+        
+        wordBank.addEventListener('drop', e => {
+            e.preventDefault();
+            if (draggedItem) {
+                wordBank.appendChild(draggedItem);
+                checkScrambleAnswer();
+            }
+        });
+
+        function checkMCQAnswer(selectedOption) {
+            const question = quizData[currentQuestionIndex];
+            const isCorrect = selectedOption === question.answer;
+
+            if (isCorrect) {
+                score++;
+                scoreDisplay.textContent = score;
+                feedback.textContent = '正解！';
+                feedback.classList.remove('bg-red-100', 'text-red-700');
+                feedback.classList.add('bg-green-100', 'text-green-700');
+            } else {
+                feedback.textContent = `不正解... 正解は「${question.answer}」`;
+                feedback.classList.remove('bg-green-100', 'text-green-700');
+                feedback.classList.add('bg-red-100', 'text-red-700');
+            }
+
+            feedback.innerHTML += `<br><span class="text-sm font-normal text-slate-600">${question.explanation}</span>`;
+            feedback.classList.remove('hidden');
+            
+            Array.from(optionsContainer.children).forEach(button => {
+                button.disabled = true;
+                if (button.textContent === question.answer) {
+                    button.classList.add('bg-green-200', 'border-green-400');
+                } else {
+                    button.classList.add('opacity-50');
+                }
+            });
+
+            nextBtn.classList.remove('hidden');
+        }
+        
+        function checkScrambleAnswer() {
+            if (wordBank.children.length > 0) return; 
+
+            const question = quizData[currentQuestionIndex];
+            const userAnswer = Array.from(answerZone.children).map(child => child.textContent).join(' ').replace(/ ([.?!,;])$/, '$1');
+            const isCorrect = userAnswer === question.answer;
+
+            if (isCorrect) {
+                score++;
+                scoreDisplay.textContent = score;
+                feedback.textContent = '正解！';
+                feedback.classList.remove('bg-red-100', 'text-red-700');
+                feedback.classList.add('bg-green-100', 'text-green-700');
+                answerZone.classList.remove('border-slate-300');
+                answerZone.classList.add('border-green-400', 'bg-green-50');
+            } else {
+                feedback.textContent = `不正解！`;
+                feedback.classList.remove('bg-green-100', 'text-green-700');
+                feedback.classList.add('bg-red-100', 'text-red-700');
+                answerZone.classList.remove('border-slate-300');
+                answerZone.classList.add('border-red-400', 'bg-red-50');
+            }
+            
+            feedback.innerHTML += `<br><span class="text-sm font-normal text-slate-600">正解: ${question.answer}<br>${question.explanation}</span>`;
+            feedback.classList.remove('hidden');
+
+            Array.from(answerZone.children).forEach(child => child.draggable = false);
+            Array.from(wordBank.children).forEach(child => child.draggable = false);
+
+            nextBtn.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                displayQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('total-questions').textContent = quizData.length;
+
+            const percentage = (score / quizData.length) * 100;
+            const message = percentage === 100 ? '素晴らしい！全問正解です！' :
+                            percentage >= 80 ? 'おしい！あと少しです！' :
+                            percentage >= 50 ? 'よくできました！' :
+                            'もう一度挑戦してみましょう！';
+            document.getElementById('result-message').textContent = message;
+        }
+
+        function restartQuiz() {
+            startScreen.classList.remove('hidden');
+            resultScreen.classList.add('hidden');
+        }
+
+        function resetState() {
+            feedback.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            optionsContainer.innerHTML = '';
+            wordBank.innerHTML = '';
+            answerZone.innerHTML = '';
+            answerZone.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
+            answerZone.classList.add('border-slate-300');
+        }
+    </script>
+</body>
+</html>
