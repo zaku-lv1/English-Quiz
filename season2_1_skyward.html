@@ -29,7 +29,7 @@
     <div id="quiz-container" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8 transition-all duration-500">
         
         <div id="start-screen">
-            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 text-center mb-2">SKYWARD</h1>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 text-center mb-2">SKYWARD (Auxiliary & Passive)</h1>
             <p class="text-slate-600 text-center mb-8">助動詞と受動態の復習問題に挑戦してみよう！</p>
             <button id="start-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
                 クイズを始める (ランダム10問)
@@ -98,9 +98,9 @@
     <script>
         const allQuizData = [
             // Stage 1, Lesson 2 (Auxiliary Verb 1)
-            { type: 'mcq', japanese: '「彼は60歳を超えているはずがない。まだ40代のはずだ。」', question: 'He {blank} be over sixty; he must still be in his forties.', options: ['can\'t', 'may not', 'must not'], answer: 'can\'t', explanation: '「〜のはずがない」という強い否定の推量を表すのは `can\'t` です。`must not` は「〜してはいけない」という禁止の意味になります。' },
+            { type: 'mcq', japanese: '「彼は60歳を超えているはずがない。まだ40代のはずだ。」', question: 'He {blank} be over sixty; he must still be in his forties.', options: ["can't", 'may not', 'must not'], answer: "can't", explanation: '「〜のはずがない」という強い否定の推量を表すのは `can\'t` です。`must not` は「〜してはいけない」という禁止の意味になります。' },
             { type: 'mcq', japanese: '「海外へ行く時、いつもビザを取らなければなりませんか？」', question: 'When you go abroad, do you always {blank} get a visa?', options: ['must', 'have to', 'should'], answer: 'have to', explanation: '「〜しなければならない」という義務を表しますが、疑問文では `Do you have to...?` の形が一般的です。' },
-            { type: 'mcq', japanese: '「このレポートは今すぐには必要ないので、すぐに提出する必要はありません。」', question: 'This report is not needed right now, so you {blank} turn it in immediately.', options: ['must not', 'don\'t have to', 'need not to'], answer: 'don\'t have to', explanation: '`don\'t have to` は「〜する必要はない」という意味です。`must not` は「〜してはいけない」という禁止になるので文脈に合いません。' },
+            { type: 'mcq', japanese: '「このレポートは今すぐには必要ないので、すぐに提出する必要はありません。」', question: 'This report is not needed right now, so you {blank} turn it in immediately.', options: ['must not', "don't have to", 'need not to'], answer: "don't have to", explanation: '`don\'t have to` は「〜する必要はない」という意味です。`must not` は「〜してはいけない」という禁止になるので文脈に合いません。' },
             { type: 'mcq', japanese: '「もっと慎重に運転すべきですよ。」', question: 'You {blank} drive your car more carefully.', options: ['should', 'might', 'can'], answer: 'should', explanation: '「〜すべきだ」という助言や提案を表す `should` が適切です。' },
             { type: 'mcq', japanese: '「ジェーンは食べるよりはむしろ読書をしたい。」', question: 'Jane would {blank} read than eat.', options: ['rather', 'better', 'like'], answer: 'rather', explanation: '`would rather A than B` で「BするよりもむしろAしたい」という意味になります。' },
             { type: 'scramble', japanese: '「すみません、郵便局がどこにあるか教えていただけませんか。」', words: ['Excuse', 'me', ',', 'could', 'you', 'tell', 'me', 'where', 'the', 'post', 'office', 'is', '?'], answer: 'Excuse me, could you tell me where the post office is?', explanation: '`Could you...?` は `Can you...?` よりも丁寧な依頼の表現です。間接疑問文なので `where` 以下の語順は `the post office is` となります。' },
@@ -108,10 +108,10 @@
             // Stage 1, Lesson 2 (Auxiliary Verb 2)
             { type: 'mcq', japanese: '「タロウは昨日そこにいたかもしれないが、誰も彼に会わなかった。」', question: 'Taro {blank} there yesterday, but nobody saw him.', options: ['might have been', 'must be', 'should be'], answer: 'might have been', explanation: '過去の出来事に対する推量（〜だったかもしれない）は `might have + 過去分詞` で表します。' },
             { type: 'mcq', japanese: '「彼はもっと早く出発すべきだったのに。」', question: 'He {blank} earlier.', options: ['should have left', 'must have left', 'could leave'], answer: 'should have left', explanation: '`should have + 過去分詞` で、過去の行動に対する後悔や非難「〜すべきだったのに（しなかった）」を表します。' },
-            { type: 'mcq', japanese: '「私は携帯電話をなくしてしまったに違いない。連絡先リストにアクセスできない。」', question: 'I must {blank} my cell phone! I can\'t get to my contact list.', options: ['have lost', 'lose', 'be losing'], answer: 'have lost', explanation: '過去の出来事に対する強い確信（〜したに違いない）は `must have + 過去分詞` で表します。' },
-            { type: 'mcq', japanese: '「とても緊張しましたが、その必要はありませんでした。試験はとても簡単でした。」', question: 'I got very nervous about the exam, but I {blank}. It was really easy.', options: ['needn\'t have', 'cannot have', 'didn\'t need'], answer: 'needn\'t have', explanation: '`needn\'t have + 過去分詞` で「〜する必要はなかったのに（してしまった）」という意味を表します。' },
+            { type: 'mcq', japanese: '「私は携帯電話をなくしてしまったに違いない。連絡先リストにアクセスできない。」', question: "I must {blank} my cell phone! I can't get to my contact list.", options: ['have lost', 'lose', 'be losing'], answer: 'have lost', explanation: '過去の出来事に対する強い確信（〜したに違いない）は `must have + 過去分詞` で表します。' },
+            { type: 'mcq', japanese: '「とても緊張しましたが、その必要はありませんでした。試験はとても簡単でした。」', question: 'I got very nervous about the exam, but I {blank}. It was really easy.', options: ["needn't have", 'cannot have', "didn't need"], answer: "needn't have", explanation: '`needn\'t have + 過去分詞` で「〜する必要はなかったのに（してしまった）」という意味を表します。' },
             { type: 'scramble', japanese: '「彼にその知らせを伝える必要はなかったのに、あなたは伝えてしまった。」', words: ['You', 'need', 'not', 'have', 'told', 'him', 'the', 'news', '.'], answer: 'You need not have told him the news.', explanation: '`need not have + 過去分詞` で「〜する必要はなかったのに」という意味になります。' },
-            { type: 'scramble', japanese: '「以前に彼に会ったことがあるかもしれませんが、どこだったか思い出せません。」', words: ['I', 'may', 'have', 'met', 'him', 'somewhere', 'before', ',', 'but', 'I', 'can\'t', 'remember', 'where', '.'], answer: 'I may have met him somewhere before, but I can\'t remember where.', explanation: '`may have + 過去分詞` で「〜したかもしれない」という過去の推量を表します。' },
+            { type: 'scramble', japanese: '「以前に彼に会ったことがあるかもしれませんが、どこだったか思い出せません。」', words: ['I', 'may', 'have', 'met', 'him', 'somewhere', 'before', ',', 'but', 'I', "can't", 'remember', 'where', '.'], answer: "I may have met him somewhere before, but I can't remember where.", explanation: '`may have + 過去分詞` で「〜したかもしれない」という過去の推量を表します。' },
 
             // Stage 1, Lesson 3 (Passive Voice)
             { type: 'mcq', japanese: '「そのボイラーは今、技術者によってチェックされています。」', question: 'The boiler is now {blank} by an engineer.', options: ['being checked', 'checked', 'checking'], answer: 'being checked', explanation: '「今〜されている最中だ」という進行中の受け身は、現在進行形の受動態 `is being + 過去分詞` で表します。' },
@@ -119,7 +119,21 @@
             { type: 'mcq', japanese: '「その賞はエリザベスに与えられた。」', question: 'A new car {blank} to Elizabeth.', options: ['was given', 'gave', 'giving'], answer: 'was given', explanation: 'SVOOの文型 `They gave Elizabeth a new car.` を受動態にした文です。`A new car` が主語なので `was given to Elizabeth` となります。' },
             { type: 'mcq', japanese: '「そのドアは一日中開けておくべきです。」', question: 'This door should {blank} open during the day.', options: ['be kept', 'keep', 'be keeping'], answer: 'be kept', explanation: '`keep + O + C` の文型を受動態にすると `S is kept C` となります。助動詞 `should` があるので `should be kept + C` の形になります。' },
             { type: 'scramble', japanese: '「図書館のカードを持っている人なら誰でも本を借りられます。」', words: ['Books', 'can', 'be', 'borrowed', 'by', 'anyone', 'who', 'has', 'a', 'library', 'card', '.'], answer: 'Books can be borrowed by anyone who has a library card.', explanation: '助動詞 `can` を含む受動態は `can be + 過去分詞` となります。「〜によって」は `by` で表します。' },
-            { type: 'scramble', japanese: '「私たちの車は、大雨のためにひどく損傷し、修理されています。」', words: ['Our', 'car', 'is', 'being', 'repaired', 'at', 'the', 'garage', '.'], answer: 'Our car is being repaired at the garage.', explanation: '「今修理されている最中」なので、現在進行形の受動態 `is being repaired` を使います。' }
+            { type: 'scramble', japanese: '「私たちの車は、大雨のためにひどく損傷し、修理されています。」', words: ['Our', 'car', 'is', 'being', 'repaired', 'at', 'the', 'garage', '.'], answer: 'Our car is being repaired at the garage.', explanation: '「今修理されている最中」なので、現在進行形の受動態 `is being repaired` を使います。' },
+
+            // New questions
+            { type: 'mcq', japanese: '「鍵が見つからない。家に忘れてきたに違いない。」', question: "I can't find my keys. I {blank} them at home.", options: ['must have left', 'should have left', 'could leave'], answer: 'must have left', explanation: '過去の出来事に対する強い確信（〜したに違いない）は `must have + 過去分詞` で表します。' },
+            { type: 'mcq', japanese: '「その問題はすでに解決されました。」', question: 'The problem {blank} already solved.', options: ['has been', 'was', 'is being'], answer: 'has been', explanation: '「すでに〜された」という完了した受け身の動作は、現在完了形の受動態 `has been + 過去分詞` を使います。' },
+            { type: 'scramble', japanese: '「あなたは両親の許可なしにそこへ行くべきではない。」', words: ['You', 'should', 'not', 'go', 'there', 'without', 'your', "parents'", 'permission', '.'], answer: "You should not go there without your parents' permission.", explanation: '「〜すべきではない」という助言・忠告は `should not + 動詞の原形` で表します。' },
+            { type: 'mcq', japanese: '「彼が真実を知っているはずがない。」', question: "He {blank} know the truth. He wasn't even there.", options: ["can't", 'must not', 'may not'], answer: "can't", explanation: '「〜のはずがない」という強い否定的な推量は `can\'t` を使います。' },
+            { type: 'mcq', japanese: '「彼らはその映画にがっかりしたかもしれない。」', question: 'They {blank} have been disappointed with the movie.', options: ['may', 'must', 'should'], answer: 'may', explanation: '過去の推量「〜だったかもしれない」は `may have + 過去分詞` で表します。' },
+            { type: 'mcq', japanese: '「この城は17世紀に建てられました。」', question: 'This castle {blank} in the 17th century.', options: ['was built', 'is built', 'has been built'], answer: 'was built', explanation: '`in the 17th century` という明確な過去の時点があるので、過去形の受動態 `was built` を使います。' },
+            { type: 'scramble', japanese: '「その会議は来週まで延期されました。」', words: ['The', 'meeting', 'has', 'been', 'put', 'off', 'until', 'next', 'week', '.'], answer: 'The meeting has been put off until next week.', explanation: '「延期された」という結果が現在に影響を及ぼしているので、現在完了形の受動態 `has been put off` を使います。' },
+            { type: 'mcq', japanese: '「傘を持っていく必要はなかったのに。雨は降らなかった。」', question: "You {blank} have taken an umbrella. It didn't rain.", options: ["needn't", 'must not', "couldn't"], answer: "needn't", explanation: '「〜する必要はなかったのに（してしまった）」は `needn\'t have + 過去分詞` で表現します。' },
+            { type: 'mcq', japanese: '「窓を開けてもよろしいでしょうか？」', question: '{blank} I open the window?', options: ['May', 'Must', 'Will'], answer: 'May', explanation: '`May I...?` は「〜してもよろしいですか」という丁寧な許可を求める表現です。' },
+            { type: 'mcq', japanese: '「その知らせを聞いたとき、彼はショックを受けたに違いない。」', question: 'He {blank} have been shocked when he heard the news.', options: ['must', 'can', 'should'], answer: 'must', explanation: '過去の出来事への強い確信「〜だったに違いない」は `must have + 過去分詞` を使います。' },
+            { type: 'mcq', japanese: '「このコンピュータは修理される必要があります。」', question: 'This computer needs {blank}.', options: ['to be repaired', 'repairing', 'repaired'], answer: 'to be repaired', explanation: '`need to be + 過去分詞` または `need + 動名詞` で「〜される必要がある」という意味になります。この選択肢では `to be repaired` が正解です。`repairing` も文法的には可能ですが、選択肢にないためこちらを選びます。' },
+            { type: 'scramble', japanese: '「彼女はクラスのみんなに笑われた。」', words: ['She', 'was', 'laughed', 'at', 'by', 'everyone', 'in', 'the', 'class', '.'], answer: 'She was laughed at by everyone in the class.', explanation: '`laugh at` のような句動詞を受動態にする場合、前置詞 `at` を忘れないように注意が必要です。' }
         ];
 
         const startScreen = document.getElementById('start-screen');
