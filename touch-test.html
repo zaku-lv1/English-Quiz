@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Test - Word Scramble</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+        .draggable-item {
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+        .drop-zone {
+            min-height: 50px;
+            border-style: dashed;
+        }
+        .dragging {
+            opacity: 0.5;
+            background-color: #e0e7ff;
+        }
+        .touch-active {
+            transform: scale(1.05);
+            z-index: 1000;
+            position: relative;
+        }
+        .drop-zone-hover {
+            background-color: #f0f9ff;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Touch Test</h1>
+            <p class="text-slate-600">語順並べ替え問題のタッチ操作テスト</p>
+        </div>
+
+        <div class="mb-4">
+            <p class="text-slate-600 mb-4">
+                <strong>日本語:</strong> 「私はそのパーティーに招待されませんでした。」
+            </p>
+            <p class="text-slate-600 mb-4">
+                下の単語をドラッグ（またはタッチ）して正しい順序に並べてください：
+            </p>
+        </div>
+
+        <!-- Answer Zone -->
+        <div id="answer-zone" class="drop-zone border-2 border-slate-300 rounded-lg p-3 mb-4 flex flex-wrap gap-2 items-center bg-slate-50 min-h-[60px]">
+            <span class="text-slate-400 text-sm">ここに単語をドロップしてください</span>
+        </div>
+
+        <!-- Word Bank -->
+        <div id="word-bank" class="flex flex-wrap gap-2 justify-center p-4 bg-white rounded-lg border mb-4">
+            <!-- Words will be added here -->
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <h3 class="font-semibold text-blue-800 mb-2">操作方法:</h3>
+            <ul class="text-sm text-blue-700 space-y-1">
+                <li>• <strong>PC:</strong> 単語をドラッグ＆ドロップ</li>
+                <li>• <strong>スマートフォン/タブレット:</strong> 単語をタッチして移動</li>
+                <li>• 正解: "I was not invited to the party."</li>
+            </ul>
+        </div>
+
+        <!-- Check Button -->
+        <button id="check-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+            答えをチェック
+        </button>
+
+        <!-- Feedback -->
+        <div id="feedback" class="mt-4 p-3 rounded-lg text-center font-bold hidden"></div>
+
+        <!-- Back to Home -->
+        <div class="mt-6 text-center">
+            <a href="index.html" class="text-blue-500 hover:text-blue-600 underline">ホームに戻る</a>
+        </div>
+    </div>
+
+    <script>
+        const words = ['I', 'was', 'not', 'invited', 'to', 'the', 'party', '.'];
+        const correctAnswer = 'I was not invited to the party .';
+        const answerZone = document.getElementById('answer-zone');
+        const wordBank = document.getElementById('word-bank');
+        const checkBtn = document.getElementById('check-btn');
+        const feedback = document.getElementById('feedback');
+
+        let draggedItem = null;
+        let touchOffset = { x: 0, y: 0 };
+        let touchTarget = null;
+        let originalPosition = null;
+
+        // Initialize words
+        function initializeWords() {
+            // Clear placeholder text
+            answerZone.innerHTML = '';
+            
+            // Shuffle words
+            const shuffledWords = [...words].sort(() => Math.random() - 0.5);
+            
+            shuffledWords.forEach(word => {
+                const wordDiv = createWordDiv(word);
+                wordBank.appendChild(wordDiv);
+            });
+        }
+
+        function createWordDiv(word) {
+            const wordDiv = document.createElement('div');
+            wordDiv.textContent = word;
+            wordDiv.classList.add('draggable-item', 'bg-white', 'border', 'border-slate-300', 'rounded-md', 'px-3', 'py-2', 'shadow-sm', 'cursor-pointer');
+            wordDiv.draggable = true;
+            
+            // Mouse events
+            wordDiv.addEventListener('dragstart', handleDragStart);
+            wordDiv.addEventListener('dragend', handleDragEnd);
+            
+            // Touch events
+            wordDiv.addEventListener('touchstart', handleTouchStart, { passive: false });
+            wordDiv.addEventListener('touchmove', handleTouchMove, { passive: false });
+            wordDiv.addEventListener('touchend', handleTouchEnd, { passive: false });
+            
+            return wordDiv;
+        }
+
+        // Mouse drag handlers
+        function handleDragStart(e) {
+            draggedItem = e.target;
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+
+        function handleDragEnd(e) {
+            draggedItem.classList.remove('dragging');
+            draggedItem = null;
+        }
+
+        // Touch event handlers
+        function handleTouchStart(e) {
+            e.preventDefault();
+            touchTarget = e.target;
+            draggedItem = e.target;
+            
+            const touch = e.touches[0];
+            const rect = touchTarget.getBoundingClientRect();
+            touchOffset.x = touch.clientX - rect.left;
+            touchOffset.y = touch.clientY - rect.top;
+            
+            // Store original position
+            originalPosition = {
+                parent: touchTarget.parentNode,
+                nextSibling: touchTarget.nextSibling
+            };
+            
+            touchTarget.classList.add('touch-active', 'dragging');
+            touchTarget.style.position = 'fixed';
+            touchTarget.style.zIndex = '1000';
+            touchTarget.style.pointerEvents = 'none';
+            updateTouchPosition(touch);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!touchTarget) return;
+            
+            const touch = e.touches[0];
+            updateTouchPosition(touch);
+            
+            // Check drop zones
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropZone = elementBelow?.closest('.drop-zone') || elementBelow?.closest('#word-bank');
+            
+            // Visual feedback for drop zones
+            document.querySelectorAll('.drop-zone, #word-bank').forEach(zone => {
+                zone.classList.remove('drop-zone-hover');
+            });
+            
+            if (dropZone) {
+                dropZone.classList.add('drop-zone-hover');
+            }
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (!touchTarget) return;
+            
+            const touch = e.changedTouches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropZone = elementBelow?.closest('.drop-zone') || elementBelow?.closest('#word-bank');
+            
+            // Reset styles
+            touchTarget.classList.remove('touch-active', 'dragging');
+            touchTarget.style.position = '';
+            touchTarget.style.zIndex = '';
+            touchTarget.style.pointerEvents = '';
+            touchTarget.style.left = '';
+            touchTarget.style.top = '';
+            
+            // Remove hover effects
+            document.querySelectorAll('.drop-zone, #word-bank').forEach(zone => {
+                zone.classList.remove('drop-zone-hover');
+            });
+            
+            // Handle drop
+            if (dropZone && dropZone !== touchTarget.parentNode) {
+                dropZone.appendChild(touchTarget);
+            } else if (!dropZone) {
+                // Return to original position if dropped outside valid zone
+                if (originalPosition.nextSibling) {
+                    originalPosition.parent.insertBefore(touchTarget, originalPosition.nextSibling);
+                } else {
+                    originalPosition.parent.appendChild(touchTarget);
+                }
+            }
+            
+            touchTarget = null;
+            draggedItem = null;
+            originalPosition = null;
+        }
+
+        function updateTouchPosition(touch) {
+            if (!touchTarget) return;
+            
+            touchTarget.style.left = (touch.clientX - touchOffset.x) + 'px';
+            touchTarget.style.top = (touch.clientY - touchOffset.y) + 'px';
+        }
+
+        // Drag over and drop events for answer zone and word bank
+        answerZone.addEventListener('dragover', e => { e.preventDefault(); });
+        wordBank.addEventListener('dragover', e => { e.preventDefault(); });
+        
+        answerZone.addEventListener('drop', e => {
+            e.preventDefault();
+            if (draggedItem) {
+                answerZone.appendChild(draggedItem);
+            }
+        });
+        
+        wordBank.addEventListener('drop', e => {
+            e.preventDefault();
+            if (draggedItem) {
+                wordBank.appendChild(draggedItem);
+            }
+        });
+
+        // Check answer
+        checkBtn.addEventListener('click', () => {
+            const wordsInAnswer = Array.from(answerZone.children).map(div => div.textContent).join(' ');
+            
+            feedback.classList.remove('hidden');
+            
+            if (wordsInAnswer === correctAnswer) {
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-green-100 text-green-800';
+                feedback.textContent = '正解！素晴らしいです！';
+            } else {
+                feedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-red-100 text-red-800';
+                feedback.textContent = `不正解。現在の答え: "${wordsInAnswer}"`;
+            }
+        });
+
+        // Initialize on load
+        initializeWords();
+    </script>
+</body>
+</html>
