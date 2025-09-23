@@ -13,6 +13,7 @@
         .draggable-item {
             cursor: grab;
             user-select: none;
+            touch-action: none;
         }
         .drop-zone {
             min-height: 50px;
@@ -21,6 +22,15 @@
         .dragging {
             opacity: 0.5;
             background-color: #e0e7ff;
+        }
+        .touch-active {
+            transform: scale(1.05);
+            z-index: 1000;
+            position: relative;
+        }
+        .drop-zone-hover {
+            background-color: #f0f9ff;
+            border-color: #3b82f6;
         }
     </style>
 </head>
@@ -215,8 +225,16 @@
             wordDiv.textContent = word;
             wordDiv.classList.add('draggable-item', 'bg-white', 'border', 'border-slate-300', 'rounded-md', 'px-3', 'py-1', 'shadow-sm');
             wordDiv.draggable = true;
+            
+            // Mouse events
             wordDiv.addEventListener('dragstart', handleDragStart);
             wordDiv.addEventListener('dragend', handleDragEnd);
+            
+            // Touch events
+            wordDiv.addEventListener('touchstart', handleTouchStart, { passive: false });
+            wordDiv.addEventListener('touchmove', handleTouchMove, { passive: false });
+            wordDiv.addEventListener('touchend', handleTouchEnd, { passive: false });
+            
             return wordDiv;
         }
 
@@ -228,6 +246,101 @@
         function handleDragEnd(e) {
             draggedItem.classList.remove('dragging');
             draggedItem = null;
+        }
+
+        // Touch event handlers for mobile support
+        let touchOffset = { x: 0, y: 0 };
+        let touchTarget = null;
+        let originalPosition = null;
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            touchTarget = e.target;
+            draggedItem = e.target;
+            
+            const touch = e.touches[0];
+            const rect = touchTarget.getBoundingClientRect();
+            touchOffset.x = touch.clientX - rect.left;
+            touchOffset.y = touch.clientY - rect.top;
+            
+            // Store original position
+            originalPosition = {
+                parent: touchTarget.parentNode,
+                nextSibling: touchTarget.nextSibling
+            };
+            
+            touchTarget.classList.add('touch-active', 'dragging');
+            touchTarget.style.position = 'fixed';
+            touchTarget.style.zIndex = '1000';
+            touchTarget.style.pointerEvents = 'none';
+            updateTouchPosition(touch);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!touchTarget) return;
+            
+            const touch = e.touches[0];
+            updateTouchPosition(touch);
+            
+            // Check drop zones
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropZone = elementBelow?.closest('.drop-zone') || elementBelow?.closest('#word-bank');
+            
+            // Visual feedback for drop zones
+            document.querySelectorAll('.drop-zone, #word-bank').forEach(zone => {
+                zone.classList.remove('drop-zone-hover');
+            });
+            
+            if (dropZone) {
+                dropZone.classList.add('drop-zone-hover');
+            }
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (!touchTarget) return;
+            
+            const touch = e.changedTouches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const dropZone = elementBelow?.closest('.drop-zone') || elementBelow?.closest('#word-bank');
+            
+            // Reset styles
+            touchTarget.classList.remove('touch-active', 'dragging');
+            touchTarget.style.position = '';
+            touchTarget.style.zIndex = '';
+            touchTarget.style.pointerEvents = '';
+            touchTarget.style.left = '';
+            touchTarget.style.top = '';
+            
+            // Remove hover effects
+            document.querySelectorAll('.drop-zone, #word-bank').forEach(zone => {
+                zone.classList.remove('drop-zone-hover');
+            });
+            
+            // Handle drop
+            if (dropZone && dropZone !== touchTarget.parentNode) {
+                dropZone.appendChild(touchTarget);
+                checkScrambleAnswer();
+            } else if (!dropZone) {
+                // Return to original position if dropped outside valid zone
+                if (originalPosition.nextSibling) {
+                    originalPosition.parent.insertBefore(touchTarget, originalPosition.nextSibling);
+                } else {
+                    originalPosition.parent.appendChild(touchTarget);
+                }
+            }
+            
+            touchTarget = null;
+            draggedItem = null;
+            originalPosition = null;
+        }
+
+        function updateTouchPosition(touch) {
+            if (!touchTarget) return;
+            
+            touchTarget.style.left = (touch.clientX - touchOffset.x) + 'px';
+            touchTarget.style.top = (touch.clientY - touchOffset.y) + 'px';
         }
 
         answerZone.addEventListener('dragover', e => { e.preventDefault(); });
