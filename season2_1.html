@@ -45,6 +45,8 @@
             <h2 class="text-2xl font-bold text-slate-800 mb-2">間違った単語リスト（ここまで）</h2>
             <div id="current-mistake-list" class="mb-4"></div>
             <button id="close-mistake-check" class="bg-sky-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-600 transition">閉じる</button>
+            <!-- 追加：ここまでの間違いで復習ボタン -->
+            <button id="mid-review-btn" class="bg-pink-500 text-white font-bold py-2 px-6 rounded-lg mt-4 hover:bg-pink-600 transition">ここまでの間違いだけで復習する</button>
         </div>
 
         <!-- 操作ボタン -->
@@ -63,7 +65,7 @@
             {"en":"voyage","ja":"航海"},{"en":"found","ja":"〜の基礎を築く"},{"en":"tribe","ja":"種族"},{"en":"transportation","ja":"移動手段"},{"en":"mankind","ja":"人類"},{"en":"heritage","ja":"遺産"},{"en":"descendant","ja":"子孫"},{"en":"civilization","ja":"文明"},{"en":"era","ja":"時代"},{"en":"appear","ja":"現れる"},
             {"en":"congress","ja":"議会"},{"en":"district","ja":"地区"},{"en":"colony","ja":"植民地"},{"en":"destination","ja":"目的地"},{"en":"declare","ja":"〜を宣言する"},{"en":"ape","ja":"類人猿"},{"en":"cliff","ja":"崖"},{"en":"afford","ja":"〜する余裕がある"},{"en":"tradition","ja":"伝統"},{"en":"prosperity","ja":"繁栄"},
             {"en":"nationality","ja":"国籍"},{"en":"occupation","ja":"職業"},{"en":"term","ja":"専門用語"},{"en":"province","ja":"地方"},{"en":"ruin","ja":"〜を破滅させる"},{"en":"translate","ja":"〜を翻訳する"},{"en":"ancestor","ja":"先祖"},{"en":"fare","ja":"運賃"},{"en":"remain","ja":"依然として〜のままである"},{"en":"media","ja":"マスメディア"},
-            // ...以下省略（全リスト貼り付けてください）
+            // ...（全リスト貼り付けてください）
             {"en":"score","ja":"得点"}
         ];
 
@@ -183,7 +185,6 @@
                 feedbackMessage.className = 'text-lg mt-2 font-medium text-red-500';
             }
             renderMistakeList("mistake-list-container", mistakes);
-            // 間違えた問題だけ復習ボタン
             const reviewBtn = document.getElementById('review-btn');
             if (mistakes.length > 0) {
                 reviewBtn.classList.remove('hidden');
@@ -213,13 +214,22 @@
         function showCurrentMistakes() {
             document.getElementById('mistake-check-container').classList.remove('hidden');
             renderMistakeList("current-mistake-list", mistakes);
+            // mid-review-btnの表示制御
+            const midReviewBtn = document.getElementById('mid-review-btn');
+            if (mistakes.length === 0) {
+                midReviewBtn.disabled = true;
+                midReviewBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                midReviewBtn.disabled = false;
+                midReviewBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         }
 
         function closeMistakeCheck() {
             document.getElementById('mistake-check-container').classList.add('hidden');
         }
 
-        // 復習ボタンイベント
+        // 復習ボタン（テスト終了用）
         document.getElementById('review-btn').addEventListener('click', function() {
             if (mistakes.length === 0) return;
             reviewMode = true;
@@ -227,6 +237,18 @@
                 question: m.question,
                 answer: m.answer
             }));
+            initializeQuiz(reviewQuestions);
+        });
+
+        // 途中復習ボタン
+        document.getElementById('mid-review-btn').addEventListener('click', function() {
+            if (mistakes.length === 0) return;
+            reviewMode = true;
+            reviewQuestions = mistakes.map(m => ({
+                question: m.question,
+                answer: m.answer
+            }));
+            closeMistakeCheck();
             initializeQuiz(reviewQuestions);
         });
 
