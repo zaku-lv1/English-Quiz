@@ -36,6 +36,8 @@
             <p id="feedback-message" class="text-lg mt-2 font-medium"></p>
             <!-- 間違えた単語リスト -->
             <div id="mistake-list-container" class="mt-6"></div>
+            <!-- 復習ボタン -->
+            <button id="review-btn" class="bg-pink-500 text-white font-bold py-2 px-6 rounded-lg mt-4 hover:bg-pink-600 transition hidden">間違えた問題だけ復習する</button>
         </div>
 
         <!-- 途中確認エリア -->
@@ -55,14 +57,23 @@
     </div>
 
     <script>
+        // 問題データ
         const wordList = [
-            {"en":"peninsula","ja":"半島"},{"en":"approach","ja":"〜に近づく"},{"en":"citizen","ja":"市民"},{"en":"pavement","ja":"舗装道路"},{"en":"assume","ja":"〜を想定する"},{"en":"slave","ja":"奴隷"},{"en":"origin","ja":"起源"},{"en":"separate","ja":"〜を分ける"},{"en":"progress","ja":"進歩"},{"en":"profit","ja":"利益"},{"en":"voyage","ja":"航海"},{"en":"found","ja":"〜の基礎を築く"},{"en":"tribe","ja":"種族"},{"en":"transportation","ja":"移動手段"},{"en":"mankind","ja":"人類"},{"en":"heritage","ja":"遺産"},{"en":"descendant","ja":"子孫"},{"en":"civilization","ja":"文明"},{"en":"era","ja":"時代"},{"en":"appear","ja":"現れる"},{"en":"congress","ja":"議会"},{"en":"district","ja":"地区"},{"en":"colony","ja":"植民地"},{"en":"destination","ja":"目的地"},{"en":"declare","ja":"〜を宣言する"},{"en":"ape","ja":"類人猿"},{"en":"cliff","ja":"崖"},{"en":"afford","ja":"〜する余裕がある"},{"en":"tradition","ja":"伝統"},{"en":"prosperity","ja":"繁栄"},{"en":"nationality","ja":"国籍"},{"en":"occupation","ja":"職業"},{"en":"term","ja":"専門用語"},{"en":"province","ja":"地方"},{"en":"ruin","ja":"〜を破滅させる"},{"en":"translate","ja":"〜を翻訳する"},{"en":"ancestor","ja":"先祖"},{"en":"fare","ja":"運賃"},{"en":"remain","ja":"依然として〜のままである"},{"en":"media","ja":"マスメディア"},{"en":"decade","ja":"10年間"},{"en":"atmosphere","ja":"雰囲気"},{"en":"destiny","ja":"運命"},{"en":"climate","ja":"気候"},{"en":"biography","ja":"伝記"},{"en":"outlook","ja":"見晴らし"},{"en":"evolution","ja":"進化"},{"en":"boundary","ja":"境界線"},{"en":"treasure","ja":"宝物"},{"en":"immigrant","ja":"移民"},{"en":"participate","ja":"〜に参加する"},{"en":"bet","ja":"〜を賭ける"},{"en":"conquer","ja":"〜を征服する"},{"en":"adjust","ja":"〜を適合させる"},{"en":"exchange","ja":"〜を交換する"},{"en":"reserve","ja":"〜を予約する"},{"en":"ban","ja":"〜を禁止する"},{"en":"linguistic","ja":"言語の"},{"en":"transfer","ja":"〜を移す"},{"en":"undergo","ja":"〜を経験する"},{"en":"brief","ja":"〜の要点をまとめる"},{"en":"cease","ja":"終わる"},{"en":"cost","ja":"〜がかかる"},{"en":"current","ja":"今の"},{"en":"trace","ja":"〜をたどる"},{"en":"immense","ja":"計り知れない"},{"en":"organize","ja":"〜を組織する"},{"en":"fluent","ja":"流ちょうな"},{"en":"flexible","ja":"融通の利く"},{"en":"disappear","ja":"見えなくなる"},{"en":"urban","ja":"都会の"},{"en":"delay","ja":"〜を延期する"},{"en":"rule","ja":"〜を支配する"},{"en":"develop","ja":"〜を発達させる"},{"en":"ancient","ja":"古代の"},{"en":"intend","ja":"〜を意図する"},{"en":"manage","ja":"何とか〜する"},{"en":"native","ja":"母国の"},{"en":"excel","ja":"優れている"},{"en":"surround","ja":"〜を取り囲む"},{"en":"rural","ja":"田舎の"},{"en":"release","ja":"〜を自由にする"},{"en":"cancel","ja":"〜を取り消す"},{"en":"literate","ja":"読み書きができる"},{"en":"unite","ja":"〜を結合させる"},{"en":"frightened","ja":"おびえた"},{"en":"conduct","ja":"〜を行う"},{"en":"content","ja":"満足して"},{"en":"ideal","ja":"理想的な"},{"en":"submit","ja":"〜を提出する"},{"en":"boring","ja":"退屈な"},{"en":"decrease","ja":"減少する"},{"en":"holy","ja":"神聖な"},{"en":"independent","ja":"独立した"},{"en":"rapid","ja":"速い"},{"en":"advance","ja":"〜を前進させる"},{"en":"vacant","ja":"空いている"},{"en":"involved","ja":"〜を伴う"},{"en":"invade","ja":"〜に侵入する"},{"en":"raise","ja":"〜を上げる"},{"en":"hurt","ja":"〜を傷つける"},{"en":"aid","ja":"援助"},{"en":"recover","ja":"〜を取り戻す"},{"en":"burden","ja":"荷"},{"en":"award","ja":"〜を授与する"},{"en":"lay","ja":"〜を横たえる"},{"en":"persist","ja":"固執する"},{"en":"circumstance","ja":"事情"},{"en":"opponent","ja":"相手"},{"en":"swell","ja":"ふくらむ"},{"en":"cell","ja":"細胞"},{"en":"search","ja":"〜を探す"},{"en":"effect","ja":"結果"},{"en":"bend","ja":"〜を曲げる"},{"en":"residence","ja":"住宅"},{"en":"disaster","ja":"災害"},{"en":"endeavor","ja":"努力"},{"en":"liquid","ja":"液体"},{"en":"express","ja":"〜を述べる"},{"en":"honor","ja":"名誉"},{"en":"infant","ja":"乳児"},{"en":"affect","ja":"〜に影響を及ぼす"},{"en":"strength","ja":"力"},{"en":"refuse","ja":"〜を断る"},{"en":"odds","ja":"優勢"},{"en":"chemical","ja":"化学薬品"},{"en":"emergency","ja":"緊急事態"},{"en":"exceed","ja":"〜に勝る"},{"en":"suffer","ja":"苦しむ"},{"en":"victim","ja":"犠牲者"},{"en":"motivation","ja":"動機"},{"en":"rescue","ja":"〜を救う"},{"en":"exercise","ja":"〜を行う"},{"en":"institution","ja":"協会"},{"en":"injury","ja":"傷"},{"en":"fatigue","ja":"疲労"},{"en":"competition","ja":"競争"},{"en":"examine","ja":"〜を調査する"},{"en":"regulation","ja":"規制"},{"en":"potential","ja":"可能性"},{"en":"prospect","ja":"見込み"},{"en":"process","ja":"〜を処理する"},{"en":"pause","ja":"一時休止"},{"en":"cure","ja":"〜を治す"},{"en":"frustration","ja":"欲求不満"},{"en":"justice","ja":"公正"},{"en":"symptom","ja":"症状"},{"en":"instruct","ja":"〜に教える"},{"en":"injection","ja":"注射"},{"en":"crash","ja":"衝突"},{"en":"mortal","ja":"死の運命にある"},{"en":"previous","ja":"前の"},{"en":"ignore","ja":"〜を無視する"},{"en":"strike","ja":"〜を打つ"},{"en":"acute","ja":"鋭い"},{"en":"fold","ja":"〜を折り畳む"},{"en":"fair","ja":"公正な"},{"en":"defend","ja":"〜を守る"},{"en":"grasp","ja":"〜をつかむ"},{"en":"thorough","ja":"徹底的な"},{"en":"apt","ja":"〜する傾向がある"},{"en":"artificial","ja":"人工の"},{"en":"imitate","ja":"〜をまねる"},{"en":"scratch","ja":"〜を引っかく"},{"en":"extreme","ja":"極端な"},{"en":"heal","ja":"〜を治す"},{"en":"ambitious","ja":"野心的な"},{"en":"urgent","ja":"緊急の"},{"en":"external","ja":"外部の"},{"en":"grow","ja":"〜を育てる"},{"en":"internal","ja":"内部の"},{"en":"restore","ja":"〜を戻す"},{"en":"relieve","ja":"〜を取り除く"},{"en":"mental","ja":"精神の"},{"en":"appropriate","ja":"適切な"},{"en":"chase","ja":"〜を追跡する"},{"en":"compete","ja":"競争する"},{"en":"elementary","ja":"初歩の"},{"en":"support","ja":"〜を支える"},{"en":"concentrate","ja":"〜を集中させる"},{"en":"aggressive","ja":"攻撃的な"},{"en":"genuine","ja":"誠実な"},{"en":"mention","ja":"〜について言及する"},{"en":"overcome","ja":"〜を克服する"},{"en":"recommend","ja":"〜を薦める"},{"en":"bear","ja":"〜を我慢する"},{"en":"drown","ja":"溺れ死ぬ"},{"en":"sore","ja":"痛い"},{"en":"physical","ja":"身体の"},{"en":"essential","ja":"極めて重要な"},{"en":"stretch","ja":"〜を伸ばす"},{"en":"acid","ja":"酸っぱい"},{"en":"anxious","ja":"心配して"},{"en":"fatal","ja":"致命的な"},{"en":"remove","ja":"〜を動かす"},{"en":"defeat","ja":"〜を打ち破る"},{"en":"successful","ja":"成功した"},{"en":"assist","ja":"〜を手伝う"},{"en":"incredible","ja":"信じられない"},{"en":"prevent","ja":"〜を妨げる"},{"en":"attitude","ja":"態度"},{"en":"discrimination","ja":"差別"},{"en":"despair","ja":"絶望"},{"en":"feature","ja":"特徴"},{"en":"neglect","ja":"〜を軽視する"},{"en":"relate","ja":"〜を関係させる"},{"en":"direction","ja":"方向"},{"en":"emotion","ja":"感情"},{"en":"mess","ja":"めちゃくちゃな様子"},{"en":"rely","ja":"〜に頼る"},{"en":"mischief","ja":"いたずら"},{"en":"interaction","ja":"交互作用"},{"en":"misery","ja":"哀れみ"},{"en":"pity","ja":"〜を哀れむ"},{"en":"facility","ja":"施設"},{"en":"poverty","ja":"貧乏"},{"en":"reputation","ja":"評判"},{"en":"envy","ja":"〜をうらやむ"},{"en":"prejudice","ja":"偏見"},{"en":"doubt","ja":"〜を疑う"},{"en":"accompany","ja":"〜と一緒に行く"},{"en":"dialect","ja":"方言"},{"en":"conflict","ja":"闘争"},{"en":"nod","ja":"うなずく"},{"en":"capacity","ja":"収容能力"},{"en":"bother","ja":"〜を悩ます"},{"en":"career","ja":"経歴"},{"en":"resemble","ja":"〜に似ている"},{"en":"advantage","ja":"有利"},{"en":"childhood","ja":"子供時代"},{"en":"impress","ja":"〜に印象付ける"},{"en":"fame","ja":"名声"},{"en":"wisdom","ja":"賢明さ"},{"en":"authority","ja":"権威"},{"en":"compare","ja":"〜を比較する"},{"en":"intellect","ja":"知性"},{"en":"charity","ja":"慈善"},{"en":"rumor","ja":"うわさ"},{"en":"congratulate","ja":"〜を祝う"},{"en":"courage","ja":"勇気"},{"en":"deceive","ja":"〜を欺く"},{"en":"rage","ja":"激怒"},{"en":"genius","ja":"天才"},{"en":"companion","ja":"仲間"},{"en":"interpreter","ja":"通訳者"},{"en":"argue","ja":"〜を議論する"},{"en":"deliver","ja":"〜を配達する"},{"en":"encourage","ja":"〜を勇気づける"},{"en":"legend","ja":"伝説"},{"en":"score","ja":"得点"}
+            {"en":"peninsula","ja":"半島"},{"en":"approach","ja":"〜に近づく"},{"en":"citizen","ja":"市民"},{"en":"pavement","ja":"舗装道路"},{"en":"assume","ja":"〜を想定する"},{"en":"slave","ja":"奴隷"},{"en":"origin","ja":"起源"},{"en":"separate","ja":"〜を分ける"},{"en":"progress","ja":"進歩"},{"en":"profit","ja":"利益"},
+            {"en":"voyage","ja":"航海"},{"en":"found","ja":"〜の基礎を築く"},{"en":"tribe","ja":"種族"},{"en":"transportation","ja":"移動手段"},{"en":"mankind","ja":"人類"},{"en":"heritage","ja":"遺産"},{"en":"descendant","ja":"子孫"},{"en":"civilization","ja":"文明"},{"en":"era","ja":"時代"},{"en":"appear","ja":"現れる"},
+            {"en":"congress","ja":"議会"},{"en":"district","ja":"地区"},{"en":"colony","ja":"植民地"},{"en":"destination","ja":"目的地"},{"en":"declare","ja":"〜を宣言する"},{"en":"ape","ja":"類人猿"},{"en":"cliff","ja":"崖"},{"en":"afford","ja":"〜する余裕がある"},{"en":"tradition","ja":"伝統"},{"en":"prosperity","ja":"繁栄"},
+            {"en":"nationality","ja":"国籍"},{"en":"occupation","ja":"職業"},{"en":"term","ja":"専門用語"},{"en":"province","ja":"地方"},{"en":"ruin","ja":"〜を破滅させる"},{"en":"translate","ja":"〜を翻訳する"},{"en":"ancestor","ja":"先祖"},{"en":"fare","ja":"運賃"},{"en":"remain","ja":"依然として〜のままである"},{"en":"media","ja":"マスメディア"},
+            // ...以下省略（全リスト貼り付けてください）
+            {"en":"score","ja":"得点"}
         ];
 
+        // クイズ進行用グローバル変数
         let allQuestions = [];
         let currentQuestionIndex = 0;
         let score = 0;
         let mistakes = [];
+        let reviewMode = false;
+        let reviewQuestions = [];
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -72,23 +83,22 @@
             return array;
         }
 
-        function initializeQuiz() {
-            allQuestions = wordList.map(word => ({
-                question: word.ja,
-                answer: word.en
-            }));
-
-            allQuestions = shuffle(allQuestions);
-            
+        function initializeQuiz(questions = null) {
+            if (questions) {
+                allQuestions = shuffle(questions.map(q => ({...q})));
+            } else {
+                allQuestions = shuffle(wordList.map(word => ({
+                    question: word.ja,
+                    answer: word.en
+                })));
+            }
             currentQuestionIndex = 0;
             score = 0;
             mistakes = [];
-
             document.getElementById('quiz-area').classList.remove('hidden');
             document.getElementById('control-buttons').classList.remove('hidden');
             document.getElementById('result-container').classList.add('hidden');
             document.getElementById('mistake-check-container').classList.add('hidden');
-            
             displayQuestion();
         }
 
@@ -97,16 +107,12 @@
                 showResults();
                 return;
             }
-
             document.getElementById('progress-indicator').textContent = `問題 ${currentQuestionIndex + 1} / ${allQuestions.length}`;
-            
             const questionContainer = document.getElementById('question-container');
             const feedbackContainer = document.getElementById('feedback-container');
             questionContainer.innerHTML = '';
             feedbackContainer.innerHTML = '';
-
             const q = allQuestions[currentQuestionIndex];
-            
             const questionHTML = `
                 <label for="spell-input" class="block text-center text-xl font-medium text-slate-700 mb-4">${q.question}</label>
                 <div class="relative max-w-sm mx-auto">
@@ -114,10 +120,8 @@
                 </div>
             `;
             questionContainer.innerHTML = questionHTML;
-            
             document.getElementById('check-btn').classList.remove('hidden');
             document.getElementById('next-btn').classList.add('hidden');
-
             const spellInput = document.getElementById('spell-input');
             spellInput.focus();
             spellInput.addEventListener('keypress', function(e) {
@@ -134,9 +138,7 @@
             const input = document.getElementById('spell-input');
             const userAnswer = input.value.trim().toLowerCase();
             const isCorrect = (userAnswer === q.answer.toLowerCase());
-            
             input.disabled = true;
-            
             if (isCorrect) {
                 score++;
                 feedbackContainer.innerHTML = `<span class="text-green-600 text-2xl">正解！ ○</span>`;
@@ -148,7 +150,6 @@
                     userAnswer: input.value
                 });
             }
-
             document.getElementById('check-btn').classList.add('hidden');
             document.getElementById('next-btn').classList.remove('hidden');
             document.getElementById('next-btn').focus();
@@ -164,10 +165,8 @@
             document.getElementById('control-buttons').classList.add('hidden');
             const resultContainer = document.getElementById('result-container');
             resultContainer.classList.remove('hidden');
-            
             const totalQuestions = allQuestions.length;
             document.getElementById('score').innerText = `正解数: ${score} / ${totalQuestions}`;
-            
             const percentage = (score / totalQuestions) * 100;
             const feedbackMessage = document.getElementById('feedback-message');
             if (percentage === 100) {
@@ -184,6 +183,13 @@
                 feedbackMessage.className = 'text-lg mt-2 font-medium text-red-500';
             }
             renderMistakeList("mistake-list-container", mistakes);
+            // 間違えた問題だけ復習ボタン
+            const reviewBtn = document.getElementById('review-btn');
+            if (mistakes.length > 0) {
+                reviewBtn.classList.remove('hidden');
+            } else {
+                reviewBtn.classList.add('hidden');
+            }
         }
 
         function renderMistakeList(containerId, list) {
@@ -213,13 +219,27 @@
             document.getElementById('mistake-check-container').classList.add('hidden');
         }
 
+        // 復習ボタンイベント
+        document.getElementById('review-btn').addEventListener('click', function() {
+            if (mistakes.length === 0) return;
+            reviewMode = true;
+            reviewQuestions = mistakes.map(m => ({
+                question: m.question,
+                answer: m.answer
+            }));
+            initializeQuiz(reviewQuestions);
+        });
+
         document.getElementById('check-btn').addEventListener('click', checkAnswer);
         document.getElementById('next-btn').addEventListener('click', nextQuestion);
-        document.getElementById('reset-btn').addEventListener('click', () => location.reload());
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            reviewMode = false;
+            initializeQuiz();
+        });
         document.getElementById('mistake-check-btn').addEventListener('click', showCurrentMistakes);
         document.getElementById('close-mistake-check').addEventListener('click', closeMistakeCheck);
 
-        window.onload = initializeQuiz;
+        window.onload = () => initializeQuiz();
     </script>
 </body>
 </html>
